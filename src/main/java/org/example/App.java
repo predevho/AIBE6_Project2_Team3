@@ -6,28 +6,28 @@ import java.util.Scanner;
 import java.util.stream.IntStream;
 
 public class App {
-    Scanner scanner = new Scanner(System.in);
-    List<Article> articles = new ArrayList<>();
-    int lastId = 0;
+    private final Scanner scanner = new Scanner(System.in);
+    private final List<Article> articles = new ArrayList<>();
+    private int lastId = 0;
 
     void run() {
 
         while (true) {
             System.out.print("명령어: ");
             String cmd = scanner.nextLine().trim();
-            if (cmd.equals("exit")) {
-                System.out.println("프로그램을 종료합니다.");
-                break;
-            } else if (cmd.equals("write")) {
-                writeArticle();
-            } else if (cmd.equals("list")) {
-                listArticles();
-            } else if (cmd.startsWith("detail")) {
-                showDetail(cmd);
-            } else if (cmd.startsWith("update")) {
-                updateArticle(cmd);
-            } else if (cmd.startsWith("delete")) {
-                deleteArticle(cmd);
+
+            Rq rq = new Rq(cmd);
+
+            switch (rq.getActionName()) {
+                case "write" -> writeArticle();
+                case "list" -> listArticles();
+                case "detail" -> showDetail(rq);
+                case "update" -> updateArticle(rq);
+                case "delete" -> deleteArticle(rq);
+                case "exit" -> {
+                    System.out.println("프로그램을 종료합니다.");
+                    return;
+                }
             }
         }
     }
@@ -58,40 +58,40 @@ public class App {
                 .map(i -> articles.size() - 1 - i)
                 .mapToObj(articles::get)
                 .forEach(
-                        article -> System.out.println("%d | %s | %s".formatted(article.id, article.title, article.createDate.format(article.formatter)))
+                        article -> System.out.printf("%d | %s | %s\n".formatted(article.getId(), article.getTitle(), article.getCreateDate()))
                 );
 
     }
 
-    void showDetail(String cmd) {
-        int id = cmdSplitId(cmd);
+    void showDetail(Rq rq) {
+        int id = rq.getParamAsInt("id", -1);
         if (id == -1) return;
 
         Article article = findById(id);
         if (article == null) return;
 
-        System.out.println("번호 : %d".formatted(article.id));
-        System.out.println("제목 : %s".formatted(article.title));
-        System.out.println("내용 : %s".formatted(article.content));
-        System.out.println("등록일 : %s".formatted(article.createDate.format(article.formatter)));
+        System.out.printf("번호 : %d\n".formatted(article.getId()));
+        System.out.printf("제목 : %s\n".formatted(article.getTitle()));
+        System.out.printf("내용 : %s\n".formatted(article.getContent()));
+        System.out.printf("등록일 : %s\n".formatted(article.getCreateDate()));
     }
 
-    void updateArticle(String cmd) {
-        int id = cmdSplitId(cmd);
+    void updateArticle(Rq rq) {
+        int id = rq.getParamAsInt("id", -1);
         if (id == -1) return;
 
         Article article = findById(id);
         if (article == null) return;
 
-        System.out.print("제목 (현재: %s): ".formatted(article.title));
+        System.out.printf("제목 (현재: %s): \n".formatted(article.getTitle()));
         String title = scanner.nextLine().trim();
 
-        System.out.print("내용 (현재: %s): ".formatted(article.content));
+        System.out.printf("내용 (현재: %s): \n".formatted(article.getContent()));
         String content = scanner.nextLine().trim();
 
         update(article, title, content);
 
-        System.out.println("=>%d번 게시글이 존재하지 않습니다.".formatted(id));
+        System.out.printf("=>%d번 게시글이 존재하지 않습니다.\n".formatted(id));
     }
 
     void update(Article article, String title, String content) {
@@ -100,15 +100,16 @@ public class App {
 
     }
 
-    void deleteArticle(String cmd) {
-        int id = cmdSplitId(cmd);
+    void deleteArticle(Rq rq) {
+        int id = rq.getParamAsInt("id", -1);
         if (id == -1) return;
 
         Article article = findById(id);
+
         if (article == null) return;
 
         delete(article);
-        System.out.println("=>%d번 게시글이 존재하지 않습니다.".formatted(id));
+        System.out.printf("=>%d번 게시글이 존재하지 않습니다.\n".formatted(id));
     }
 
     void delete(Article article) {
@@ -120,23 +121,9 @@ public class App {
                 .filter(article -> article.getId() == id)
                 .findFirst()
                 .orElseGet(() -> {
-                    System.out.println("=>%d번 게시글이 존재하지 않습니다.".formatted(id));
+                    System.out.printf("=>%d번 게시글이 존재하지 않습니다.\n".formatted(id));
                     return null;
                 });
     }
 
-    int cmdSplitId(String cmd) {
-        String[] cmdBits = cmd.split(" ");
-        if (cmdBits.length < 2 || cmdBits[1].isEmpty()) {
-            System.out.println("명령어를 확인해주세요.");
-            return -1;
-        }
-
-        try {
-            return Integer.parseInt(cmdBits[1]);
-        } catch (NumberFormatException e) {
-            System.out.println("명령어를 확인해주세요.");
-            return -1;
-        }
-    }
 }

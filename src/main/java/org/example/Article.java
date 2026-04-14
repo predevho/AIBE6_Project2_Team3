@@ -4,16 +4,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 class Article {
-    int id;
-    String title;
-    String content;
-    LocalDateTime createDate;
-    LocalDateTime updateDate;
+    private final int id;
+    private String title;
+    private String content;
+    private final LocalDateTime createDate;
+    private final LocalDateTime updateDate;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public Article(int id, String title, String content) {
-        LocalDateTime now = LocalDateTime.now();
         this.id = id;
+        LocalDateTime now = LocalDateTime.now();
         this.title = title;
         this.content = content;
         this.createDate = now;
@@ -32,7 +32,19 @@ class Article {
         this.title = title;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
     public int getId() {
         return id;
+    }
+
+    public String getCreateDate() {
+        return createDate.format(formatter);
+    }
+
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
     }
 }
