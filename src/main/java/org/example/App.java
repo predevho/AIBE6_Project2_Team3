@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.domain.system.SystemController;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -11,6 +13,7 @@ public class App {
     private int lastId = 0;
 
     void run() {
+        SystemController systemController = new SystemController();
 
         while (true) {
             System.out.print("명령어: ");
@@ -25,7 +28,7 @@ public class App {
                 case "update" -> updateArticle(rq);
                 case "delete" -> deleteArticle(rq);
                 case "exit" -> {
-                    System.out.println("프로그램을 종료합니다.");
+                    systemController.actionExit();
                     return;
                 }
             }
