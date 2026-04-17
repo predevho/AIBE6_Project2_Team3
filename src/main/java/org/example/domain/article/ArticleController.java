@@ -12,8 +12,8 @@ public class ArticleController {
     private final Scanner scanner;
 
     public ArticleController(Scanner scanner) {
-        this.articleService = new ArticleService();
         this.scanner = scanner;
+        this.articleService = new ArticleService(new ArticleRepository());
     }
 
     public void writeArticle() {
@@ -69,7 +69,7 @@ public class ArticleController {
 
         articleService.update(article, title, content);
 
-        System.out.printf("=>%d번 게시글이 존재하지 않습니다.\n".formatted(id));
+        System.out.printf("=>%d번 게시글이 수정되었습니다.\n".formatted(id));
     }
 
 
@@ -83,7 +83,7 @@ public class ArticleController {
         if (article == null) return;
 
         articleService.delete(article);
-        System.out.printf("=>%d번 게시글이 존재하지 않습니다.\n".formatted(id));
+        System.out.printf("=>%d번 게시글이 삭제되었습니다.\n".formatted(id));
     }
 
 
