@@ -3,7 +3,7 @@ package org.example;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-class Article {
+public class Article {
     private final int id;
     private String title;
     private String content;
